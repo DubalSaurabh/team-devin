@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="importmap">
+        {
+          "imports": {
+            "@google/generative-ai": "https://esm.run/@google/generative-ai"
+          }
+        }
+      </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Code Editor</title>
+ <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="change-layout">Change Layout</div><br>
+    <button onclick="generateCode()" class="change-layout1 ">Review Code</button>
+    
+
+    <div class="container view2">
+        <div class="coder view2">
+            <div class="code-editor htmlCoder">
+                <div class="code-type">HTML</div>
+              <div class="code html" id="html"></div>
+            </div>
+            <div class="code-editor cssCoder">
+                <div class="code-type">CSS</div>
+                <div class="code css" id="css"></div>
+            </div>
+            <div class="code-editor jsCoder">
+                <div class="code-type">JS</div>
+                <div class="code js" id="javascript"></div>
+            </div>
+        </div>
+        <div class="output">
+            <iframe src="" class="virtual-iframe" frameborder="0"></iframe>
+
+        </div>
+
+    </div>
+    <div id="popup" class="popup">
+        <div class="wrapper">   
+            <button  onclick="closeTab()" class="close-btn">X</button>
+            <p id="code-response"></p>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+    <script src="editor.js"></script>
+</body>
+<script>
+    
+        function closeTab(){
+            
+    document.getElementById("popup").style.display="none"
+
+}
+</script>
+<script type="module">
+
+    import { GoogleGenerativeAI } from "@google/generative-ai";
+
+
+async function init() { // Create an async function to load the script
+
+// Replace with your actual API key
+const API_KEY = "AIzaSyCZkY7qvHJ0wSQjFoD4plMwP9w2yp0OSm4";
+
+const genAI = new GoogleGenerativeAI(API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+const userInput = document.getElementById("userInput");
+const outputField = document.getElementById("outputField");
+
+async function generateCode() {
+    document.getElementById("popup").style.display="block"
+    document.getElementById("popup").style.display="flex"
+    const prompt = `**Review the following code and provide feedback in the format provided below. I'm presenting you with HTML, CSS, and JS code sections, each prefixed appropriately. Your task is to identify errors in the following code sections and provide feedback accordingly:** **Error:** (Specific error message and location)
+**Solution:** (Proposed solution to fix the error)
+**Code:**
+HTML:
+${document.getElementById("html").innerText}
+CSS:
+${document.getElementById("css").innerText}
+JS:
+${document.getElementById("javascript").innerText}
+`;  
+
+
+console.log(prompt);
+
+  try {
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    console.log(text)
+    document.getElementById("code-response").innerText=text 
+    outputField.textContent = text;
+
+  } catch (error) {
+    console.error(error);
+    outputField.textContent = "Error generating code review.";
+  }
+}
+
+// Button click handler now waits for script to load
+const button = document.querySelector("button");
+button.addEventListener("click", generateCode); // Use addEventListener
+}
+
+init(); // Call the init function to load the script
+
+
+</script>
+
+</html>
